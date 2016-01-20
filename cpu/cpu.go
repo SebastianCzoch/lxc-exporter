@@ -33,6 +33,26 @@ func GetProcStat() (ProcStat, error) {
 	return parseProcStat(content), nil
 }
 
+func (p *ProcStat) Refresh() error {
+	content, err := fetchProcStat()
+	if err != nil {
+		return err
+	}
+
+	newProc := parseProcStat(content)
+
+	p.User = newProc.User
+	p.System = newProc.System
+	p.Nice = newProc.Nice
+	p.Idle = newProc.Idle
+	p.Wait = newProc.Wait
+	p.Irq = newProc.Irq
+	p.Srq = newProc.Srq
+	p.Zero = newProc.Zero
+
+	return nil
+}
+
 func (p *ProcStat) CalculateUsageInPrecentage() float32 {
 	total := float32(p.User + p.System + p.Nice + p.Idle + p.Irq + p.Srq + p.Zero + p.Wait)
 	idle := float32(p.Idle + p.Wait)
