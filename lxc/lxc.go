@@ -3,63 +3,68 @@ package lxc
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
-
-	"github.com/SebastianCzoch/lxc-exporter/lxc/lxc0"
 )
 
-type Usage struct {
-	System int
-	User   int
-}
+var (
+	cgroupPath = "/sys/fs/cgroup"
+	lxcPath    = map[int]string{
+		3: fmt.Sprintf("%s/lxc", cgroupPath),
+		4: fmt.Sprintf("%s/cpu,cpuacct/lxc", cgroupPath),
+	}
 
-type LXC interface {
-	GetContainers() []string
-	GetCPUUsage(container string) (lxc0.Usage, error)
-}
-
-type LXCVersion string
-
-const (
-	LXC0       = "lxc0"
-	LXC1       = "lxc1"
-	cgroupPath = "test/sys/fs/cgroup" //TODO FIXME!
-
-	errorNoCGroupsFound = "no cgroups found"
-	errorNoLXCFound     = "no LXC found"
+	errorNoCGroupsFound     = fmt.Errorf("no cgroups found at %s", cgroupPath)
+	errorKernelNotSupported = errors.New("yours version of kernel is not supported")
 )
 
-func GetLXCManager() (LXC, error) {
+type LXC struct {
+	kernelVersion  int
+	containersPath string
+}
+
+func New(kernelVersion int) (*LXC, error) {
 	err := checkCGroups()
 	if err != nil {
 		return nil, err
 	}
 
-	if isLXC0() {
-		return lxc0.LXC{}, nil
+	containersPath, err := getContainersPath(kernelVersion)
+	if err != nil {
+		return nil, err
 	}
 
-	if isLXC1() {
-		return nil, errors.New("not supported yet")
+	return &LXC{
+		kernelVersion:  kernelVersion,
+		containersPath: containersPath,
+	}, nil
+}
+
+func (l *LXC) GetContainers() []string {
+	var containers = []string{}
+	files, _ := ioutil.ReadDir(l.containersPath)
+	for _, f := range files {
+		if f.IsDir() {
+			containers = append(containers, f.Name())
+		}
 	}
 
-	return nil, errors.New(errorNoLXCFound)
+	return containers
 }
 
-func isLXC0() bool {
-	_, err := os.Stat(fmt.Sprintf("%s/%s", cgroupPath, "lxc"))
-	return !os.IsNotExist(err)
-}
+func getContainersPath(kernelVersion int) (string, error) {
+	if _, ok := lxcPath[kernelVersion]; !ok {
+		return "", errorKernelNotSupported
+	}
 
-func isLXC1() bool {
-	_, err := os.Stat(fmt.Sprintf("%s/%s/%s", cgroupPath, "cpu", "lxc"))
-	return !os.IsNotExist(err)
+	return lxcPath[kernelVersion], nil
+
 }
 
 func checkCGroups() error {
 	_, err := os.Stat(cgroupPath)
 	if os.IsNotExist(err) {
-		return errors.New(errorNoCGroupsFound)
+		return errorNoCGroupsFound
 	}
 
 	return nil
