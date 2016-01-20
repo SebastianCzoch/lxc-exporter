@@ -3,6 +3,7 @@ package lxc
 import (
 	"testing"
 
+	"github.com/SebastianCzoch/lxc-exporter/cpu"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -82,4 +83,24 @@ func TestGetProcStat(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 3092210213, res.User)
 	assert.Equal(t, 311472536, res.System)
+}
+
+func TestCalculateUsageInPrecentage(t *testing.T) {
+	physical := cpu.ProcStat{
+		User:   371569,
+		System: 78721,
+		Nice:   342711,
+		Idle:   39660594,
+		Wait:   23304,
+		Irq:    0,
+		Srq:    19646,
+		Zero:   0,
+	}
+
+	object := ProcStat{
+		User:   2210213,
+		System: 79536,
+	}
+
+	assert.Equal(t, float32(5.45), object.CalculateUsageInPrecentage(physical))
 }

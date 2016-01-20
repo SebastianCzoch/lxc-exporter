@@ -45,6 +45,10 @@ func (p *ProcStat) CalculateUsageInPrecentage() float32 {
 	return float32(int(usage*100)) / 100
 }
 
+func (p *ProcStat) GetPrevIdleAndTotal() (float32, float32) {
+	return p.prevIdle, p.prevTotal
+}
+
 func fetchProcStat() ([]byte, error) {
 	return ioutil.ReadFile(procStatPath)
 }

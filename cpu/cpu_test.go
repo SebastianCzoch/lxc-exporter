@@ -93,3 +93,14 @@ func TestCalculateUsageInPrecentageSecond(t *testing.T) {
 
 	assert.Equal(t, float32(95.80), object.CalculateUsageInPrecentage())
 }
+
+func TestGetPrevIdleAndTotal(t *testing.T) {
+	object := ProcStat{
+		prevIdle:  39650594,
+		prevTotal: 39690594,
+	}
+
+	idle, total := object.GetPrevIdleAndTotal()
+	assert.Equal(t, float32(39650594), idle)
+	assert.Equal(t, float32(39690594), total)
+}

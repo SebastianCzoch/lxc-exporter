@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/SebastianCzoch/lxc-exporter/cpu"
 )
 
 type ProcStat struct {
@@ -33,6 +35,17 @@ func (l *LXC) GetProcStat(containerName string) (ProcStat, error) {
 	}
 
 	return parseProcStat(cpuStat), nil
+}
+
+func (p *ProcStat) CalculateUsageInPrecentage(physical cpu.ProcStat) float32 {
+	prevIdle, prevTotal := physical.GetPrevIdleAndTotal()
+	total := float32(p.User + p.System + physical.Idle + physical.Wait)
+	idle := float32(physical.Idle + physical.Wait)
+	diffIdle := idle - prevIdle
+	diffTotal := total - prevTotal
+	usage := (diffTotal - diffIdle) / diffTotal * 100
+
+	return float32(int(usage*100)) / 100
 }
 
 func (l *LXC) fetchProcStat(containerName string) ([]byte, error) {
