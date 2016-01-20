@@ -38,11 +38,13 @@ func (l *LXC) GetProcStat(containerName string) (ProcStat, error) {
 }
 
 func (p *ProcStat) CalculateUsageInPrecentage(physical cpu.ProcStat) float32 {
-	prevIdle, prevTotal := physical.GetPrevIdleAndTotal()
+	// prevIdle, prevTotal := physical.GetPrevIdleAndTotal()
 	total := float32(p.User + p.System + physical.Idle + physical.Wait)
 	idle := float32(physical.Idle + physical.Wait)
-	diffIdle := idle - prevIdle
-	diffTotal := total - prevTotal
+	diffIdle := idle
+	diffTotal := total
+	fmt.Println("Idle:", diffIdle)
+	fmt.Println("Total:", diffTotal)
 	usage := (diffTotal - diffIdle) / diffTotal * 100
 
 	return float32(int(usage*100)) / 100

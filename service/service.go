@@ -10,15 +10,14 @@ import (
 	"github.com/prometheus/common/log"
 )
 
-const subsystem = "exporter"
-
 var (
+	collectors          = make(map[string]collector.Collector)
 	collectorLabelNames = []string{"collector", "result"}
 
 	scrapeDurations = prometheus.NewSummaryVec(
 		prometheus.SummaryOpts{
 			Namespace: collector.Namespace,
-			Subsystem: subsystem,
+			Subsystem: "exporter",
 			Name:      "scrape_duration_seconds",
 			Help:      "node_exporter: Duration of a scrape job.",
 		},
@@ -44,25 +43,30 @@ func StartServer(addr *string) {
 }
 
 func StartColectors() {
-	collectors := map[string]collector.Collector{}
-	collectors["lxc_cpu"], _ = collector.NewStatCollector()
+	collectors["lxc_cpu"] = collector.NewCPUStatCollector()
+	for name, c := range collectors {
+		err := c.Init()
+		if err != nil {
+			delete(collectors, name)
+			log.Errorf("collector %s disabled, because: %s", name, err.Error())
+		}
+	}
 
-	nodeCollector := NodeCollector{collectors: collectors}
-	prometheus.MustRegister(nodeCollector)
+	prometheus.MustRegister(LXCCollector{collectors: collectors})
 }
 
-// NodeCollector implements the prometheus.Collector interface.
-type NodeCollector struct {
+// LXCCollector implements the prometheus.Collector interface.
+type LXCCollector struct {
 	collectors map[string]collector.Collector
 }
 
 // Describe implements the prometheus.Collector interface.
-func (n NodeCollector) Describe(ch chan<- *prometheus.Desc) {
+func (n LXCCollector) Describe(ch chan<- *prometheus.Desc) {
 	scrapeDurations.Describe(ch)
 }
 
 // Collect implements the prometheus.Collector interface.
-func (n NodeCollector) Collect(ch chan<- prometheus.Metric) {
+func (n LXCCollector) Collect(ch chan<- prometheus.Metric) {
 	wg := sync.WaitGroup{}
 	wg.Add(len(n.collectors))
 	for name, c := range n.collectors {
@@ -79,14 +83,13 @@ func execute(name string, c collector.Collector, ch chan<- prometheus.Metric) {
 	begin := time.Now()
 	err := c.Update(ch)
 	duration := time.Since(begin)
-	var result string
 
 	if err != nil {
 		log.Errorf("ERROR: %s collector failed after %fs: %s", name, duration.Seconds(), err)
-		result = "error"
-	} else {
-		log.Debugf("OK: %s collector succeeded after %fs.", name, duration.Seconds())
-		result = "success"
+		scrapeDurations.WithLabelValues(name, "error").Observe(duration.Seconds())
+		return
 	}
-	scrapeDurations.WithLabelValues(name, result).Observe(duration.Seconds())
+
+	log.Debugf("OK: %s collector succeeded after %fs.", name, duration.Seconds())
+	scrapeDurations.WithLabelValues(name, "success").Observe(duration.Seconds())
 }

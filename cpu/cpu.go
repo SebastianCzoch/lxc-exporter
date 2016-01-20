@@ -12,16 +12,22 @@ var (
 )
 
 type ProcStat struct {
-	User      int
-	System    int
-	Nice      int
-	Idle      int
-	Wait      int
-	Irq       int
-	Srq       int
-	Zero      int
-	prevTotal float32
-	prevIdle  float32
+	User       int
+	System     int
+	Nice       int
+	Idle       int
+	Wait       int
+	Irq        int
+	Srq        int
+	Zero       int
+	prevUser   int
+	prevSystem int
+	prevNice   int
+	prevIdle   int
+	prevWait   int
+	prevIrq    int
+	prevSrq    int
+	prevZero   int
 }
 
 func GetProcStat() (ProcStat, error) {
@@ -33,40 +39,31 @@ func GetProcStat() (ProcStat, error) {
 	return parseProcStat(content), nil
 }
 
-func (p *ProcStat) Refresh() error {
+func (p *ProcStat) Refresh() (ProcStat, error) {
 	content, err := fetchProcStat()
 	if err != nil {
-		return err
+		return ProcStat{}, err
 	}
 
 	newProc := parseProcStat(content)
-
-	p.User = newProc.User
-	p.System = newProc.System
-	p.Nice = newProc.Nice
-	p.Idle = newProc.Idle
-	p.Wait = newProc.Wait
-	p.Irq = newProc.Irq
-	p.Srq = newProc.Srq
-	p.Zero = newProc.Zero
-
-	return nil
-}
-
-func (p *ProcStat) CalculateUsageInPrecentage() float32 {
-	total := float32(p.User + p.System + p.Nice + p.Idle + p.Irq + p.Srq + p.Zero + p.Wait)
-	idle := float32(p.Idle + p.Wait)
-	diffIdle := idle - p.prevIdle
-	diffTotal := total - p.prevTotal
-	usage := (diffTotal - diffIdle) / diffTotal * 100
-
-	p.prevIdle = idle
-	p.prevTotal = total
-	return float32(int(usage*100)) / 100
-}
-
-func (p *ProcStat) GetPrevIdleAndTotal() (float32, float32) {
-	return p.prevIdle, p.prevTotal
+	return ProcStat{
+		User:       newProc.User - p.prevUser,
+		System:     newProc.System - p.prevSystem,
+		Nice:       newProc.Nice - p.prevNice,
+		Idle:       newProc.Idle - p.prevIdle,
+		Wait:       newProc.Wait - p.prevWait,
+		Irq:        newProc.Irq - p.prevIrq,
+		Srq:        newProc.Srq - p.prevSrq,
+		Zero:       newProc.Zero - p.prevZero,
+		prevUser:   newProc.User,
+		prevSystem: newProc.System,
+		prevNice:   newProc.Nice,
+		prevIdle:   newProc.Idle,
+		prevWait:   newProc.Wait,
+		prevIrq:    newProc.Irq,
+		prevSrq:    newProc.Srq,
+		prevZero:   newProc.Zero,
+	}, nil
 }
 
 func fetchProcStat() ([]byte, error) {
@@ -80,14 +77,22 @@ func parseProcStat(content []byte) ProcStat {
 	cpuSum := strings.Split(lines[0], " ")
 
 	return ProcStat{
-		User:   forceToInt(cpuSum[1]),
-		System: forceToInt(cpuSum[2]),
-		Nice:   forceToInt(cpuSum[3]),
-		Idle:   forceToInt(cpuSum[4]),
-		Wait:   forceToInt(cpuSum[5]),
-		Irq:    forceToInt(cpuSum[6]),
-		Srq:    forceToInt(cpuSum[7]),
-		Zero:   forceToInt(cpuSum[8]),
+		User:       forceToInt(cpuSum[1]),
+		System:     forceToInt(cpuSum[2]),
+		Nice:       forceToInt(cpuSum[3]),
+		Idle:       forceToInt(cpuSum[4]),
+		Wait:       forceToInt(cpuSum[5]),
+		Irq:        forceToInt(cpuSum[6]),
+		Srq:        forceToInt(cpuSum[7]),
+		Zero:       forceToInt(cpuSum[8]),
+		prevUser:   forceToInt(cpuSum[1]),
+		prevSystem: forceToInt(cpuSum[2]),
+		prevNice:   forceToInt(cpuSum[3]),
+		prevIdle:   forceToInt(cpuSum[4]),
+		prevWait:   forceToInt(cpuSum[5]),
+		prevIrq:    forceToInt(cpuSum[6]),
+		prevSrq:    forceToInt(cpuSum[7]),
+		prevZero:   forceToInt(cpuSum[8]),
 	}
 }
 
