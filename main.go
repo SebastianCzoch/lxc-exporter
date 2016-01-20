@@ -26,22 +26,22 @@
 
 // 	for {
 
-// 		content, _ := ioutil.ReadFile("/proc/stat")
-// 		reg := regexp.MustCompile("\\s\\s+")
-// 		content = reg.ReplaceAll(content, []byte(" "))
-// 		lines := strings.Split(string(content), "\n")
-// 		cpuSum := strings.Split(lines[0], " ")
+		content, _ := ioutil.ReadFile("/proc/stat")
+		reg := regexp.MustCompile("\\s\\s+")
+		content = reg.ReplaceAll(content, []byte(" "))
+		lines := strings.Split(string(content), "\n")
+		cpuSum := strings.Split(lines[0], " ")
 
-// 		cpuStruct := cpu.ProcStat{
-// 			User:   forceToInt(cpuSum[1]),
-// 			System: forceToInt(cpuSum[2]),
-// 			Nice:   forceToInt(cpuSum[3]),
-// 			Idle:   forceToInt(cpuSum[4]),
-// 			Wait:   forceToInt(cpuSum[5]),
-// 			Irq:    forceToInt(cpuSum[6]),
-// 			Srq:    forceToInt(cpuSum[7]),
-// 			Zero:   forceToInt(cpuSum[8]),
-// 		}
+		cpuStruct := cpu.ProcStat{
+			User:   forceToInt(cpuSum[1]),
+			System: forceToInt(cpuSum[2]),
+			Nice:   forceToInt(cpuSum[3]),
+			Idle:   forceToInt(cpuSum[4]),
+			Wait:   forceToInt(cpuSum[5]),
+			Irq:    forceToInt(cpuSum[6]),
+			Srq:    forceToInt(cpuSum[7]),
+			Zero:   forceToInt(cpuSum[8]),
+		}
 
 // 		usage, idle, total = cpuStruct.CalculateUsage(idle, total)
 // 		fmt.Println("Physical usage: ", usage, "%")
