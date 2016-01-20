@@ -12,14 +12,16 @@ var (
 )
 
 type ProcStat struct {
-	User   int
-	System int
-	Nice   int
-	Idle   int
-	Wait   int
-	Irq    int
-	Srq    int
-	Zero   int
+	User      int
+	System    int
+	Nice      int
+	Idle      int
+	Wait      int
+	Irq       int
+	Srq       int
+	Zero      int
+	prevTotal float32
+	prevIdle  float32
 }
 
 func GetProcStat() (ProcStat, error) {
@@ -29,6 +31,18 @@ func GetProcStat() (ProcStat, error) {
 	}
 
 	return parseProcStat(content), nil
+}
+
+func (p *ProcStat) CalculateUsageInPrecentage() float32 {
+	total := float32(p.User + p.System + p.Nice + p.Idle + p.Irq + p.Srq + p.Zero + p.Wait)
+	idle := float32(p.Idle + p.Wait)
+	diffIdle := idle - p.prevIdle
+	diffTotal := total - p.prevTotal
+	usage := (diffTotal - diffIdle) / diffTotal * 100
+
+	p.prevIdle = idle
+	p.prevTotal = total
+	return float32(int(usage*100)) / 100
 }
 
 func fetchProcStat() ([]byte, error) {

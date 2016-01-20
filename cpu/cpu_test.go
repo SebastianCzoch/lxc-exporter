@@ -61,3 +61,35 @@ func TestGetProcStat(t *testing.T) {
 		Zero:   0,
 	}, object)
 }
+
+func TestCalculateUsageInPrecentage(t *testing.T) {
+	object := ProcStat{
+		User:   371569,
+		System: 78721,
+		Nice:   342711,
+		Idle:   39660594,
+		Wait:   23304,
+		Irq:    0,
+		Srq:    19646,
+		Zero:   0,
+	}
+
+	assert.Equal(t, float32(2), object.CalculateUsageInPrecentage())
+}
+
+func TestCalculateUsageInPrecentageSecond(t *testing.T) {
+	object := ProcStat{
+		User:      371569,
+		System:    67121,
+		Nice:      342711,
+		Idle:      39660594,
+		Wait:      23304,
+		Irq:       0,
+		Srq:       19646,
+		Zero:      0,
+		prevIdle:  39650594,
+		prevTotal: 39690594,
+	}
+
+	assert.Equal(t, float32(95.80), object.CalculateUsageInPrecentage())
+}
