@@ -67,3 +67,13 @@ func TestGetContainersList(t *testing.T) {
 	assert.Len(t, list, 2)
 	assert.Equal(t, list[0], "test-container")
 }
+
+func TestContainerExists(t *testing.T) {
+	l := &LXC{
+		kernelVersion:  3,
+		containersPath: "../test/sys/fs/cgroup/lxc",
+	}
+
+	assert.False(t, l.containerExists("not-existed"))
+	assert.True(t, l.containerExists("test-container"))
+}

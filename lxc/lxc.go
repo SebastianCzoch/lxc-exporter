@@ -7,6 +7,10 @@ import (
 	"os"
 )
 
+const (
+	containerDirectoryPattern = "%s/%s"
+)
+
 var (
 	cgroupPath = "/sys/fs/cgroup"
 	lxcPath    = map[int]string{
@@ -52,13 +56,17 @@ func (l *LXC) GetContainers() []string {
 	return containers
 }
 
+func (l *LXC) containerExists(containerName string) bool {
+	_, err := os.Stat(fmt.Sprintf(containerDirectoryPattern, l.containersPath, containerName))
+	return err == nil
+}
+
 func getContainersPath(kernelVersion int) (string, error) {
 	if _, ok := lxcPath[kernelVersion]; !ok {
 		return "", errorKernelNotSupported
 	}
 
 	return lxcPath[kernelVersion], nil
-
 }
 
 func checkCGroups() error {
