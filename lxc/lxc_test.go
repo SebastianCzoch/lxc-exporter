@@ -77,3 +77,12 @@ func TestContainerExists(t *testing.T) {
 	assert.False(t, l.containerExists("not-existed"))
 	assert.True(t, l.containerExists("test-container"))
 }
+
+func TestForceToFloat64(t *testing.T) {
+	assert.Equal(t, float64(1), forceToFloat64("1"))
+	assert.Equal(t, float64(0), forceToFloat64("a1"))
+	assert.Equal(t, float64(0), forceToFloat64("1a"))
+	assert.Equal(t, float64(1.21), forceToFloat64("1.21"))
+	assert.Equal(t, float64(12), forceToFloat64("1.2e1"))
+	assert.Equal(t, float64(0), forceToFloat64("1.2s1"))
+}

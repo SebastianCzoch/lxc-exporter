@@ -59,15 +59,6 @@ func TestFetchProcStat(t *testing.T) {
 	assert.Equal(t, "user 3092210213\nsystem 311472536\n", string(res))
 }
 
-func TestForceToFloat64(t *testing.T) {
-	assert.Equal(t, float64(1), forceToFloat64("1"))
-	assert.Equal(t, float64(0), forceToFloat64("a1"))
-	assert.Equal(t, float64(0), forceToFloat64("1a"))
-	assert.Equal(t, float64(1.21), forceToFloat64("1.21"))
-	assert.Equal(t, float64(12), forceToFloat64("1.2e1"))
-	assert.Equal(t, float64(0), forceToFloat64("1.2s1"))
-}
-
 func TestParseProcStat(t *testing.T) {
 	res := parseProcStat([]byte("user 3092210213\nsystem 311472536\n"))
 	assert.Equal(t, float64(3092210213), res.User)

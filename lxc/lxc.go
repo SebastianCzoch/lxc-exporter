@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 )
 
 const (
@@ -20,6 +21,7 @@ var (
 
 	errorNoCGroupsFound     = fmt.Errorf("no cgroups found at %s", cgroupPath)
 	errorKernelNotSupported = errors.New("yours version of kernel is not supported")
+	errorContainerNotFound  = errors.New("container not found")
 )
 
 type LXC struct {
@@ -76,4 +78,9 @@ func checkCGroups() error {
 	}
 
 	return nil
+}
+
+func forceToFloat64(variable string) float64 {
+	value, _ := strconv.ParseFloat(variable, 64)
+	return value
 }

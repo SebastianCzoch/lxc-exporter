@@ -1,11 +1,9 @@
 package lxc
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -15,8 +13,7 @@ type ProcStat struct {
 }
 
 var (
-	errorContainerNotFound = errors.New("container not found")
-	lxcCPUStatPathPattern  = map[int]string{
+	lxcCPUStatPathPattern = map[int]string{
 		3: "%s/lxc/%s/cpuacct.stat",
 		4: "%s/cpu,cpuacct/lxc/%s/cpuacct.stat",
 	}
@@ -60,9 +57,4 @@ func parseProcStat(content []byte) ProcStat {
 	system := strings.Split(lines[1], " ")
 
 	return ProcStat{User: forceToFloat64(user[1]), System: forceToFloat64(system[1])}
-}
-
-func forceToFloat64(variable string) float64 {
-	value, _ := strconv.ParseFloat(variable, 64)
-	return value
 }
