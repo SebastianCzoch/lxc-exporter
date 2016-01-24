@@ -12,22 +12,22 @@ var (
 )
 
 type ProcStat struct {
-	User       int
-	System     int
-	Nice       int
-	Idle       int
-	Wait       int
-	Irq        int
-	Srq        int
-	Zero       int
-	prevUser   int
-	prevSystem int
-	prevNice   int
-	prevIdle   int
-	prevWait   int
-	prevIrq    int
-	prevSrq    int
-	prevZero   int
+	User       float64
+	System     float64
+	Nice       float64
+	Idle       float64
+	Wait       float64
+	Irq        float64
+	Srq        float64
+	Zero       float64
+	prevUser   float64
+	prevSystem float64
+	prevNice   float64
+	prevIdle   float64
+	prevWait   float64
+	prevIrq    float64
+	prevSrq    float64
+	prevZero   float64
 }
 
 func GetProcStat() (ProcStat, error) {
@@ -77,26 +77,26 @@ func parseProcStat(content []byte) ProcStat {
 	cpuSum := strings.Split(lines[0], " ")
 
 	return ProcStat{
-		User:       forceToInt(cpuSum[1]),
-		System:     forceToInt(cpuSum[2]),
-		Nice:       forceToInt(cpuSum[3]),
-		Idle:       forceToInt(cpuSum[4]),
-		Wait:       forceToInt(cpuSum[5]),
-		Irq:        forceToInt(cpuSum[6]),
-		Srq:        forceToInt(cpuSum[7]),
-		Zero:       forceToInt(cpuSum[8]),
-		prevUser:   forceToInt(cpuSum[1]),
-		prevSystem: forceToInt(cpuSum[2]),
-		prevNice:   forceToInt(cpuSum[3]),
-		prevIdle:   forceToInt(cpuSum[4]),
-		prevWait:   forceToInt(cpuSum[5]),
-		prevIrq:    forceToInt(cpuSum[6]),
-		prevSrq:    forceToInt(cpuSum[7]),
-		prevZero:   forceToInt(cpuSum[8]),
+		User:       forceToFloat64(cpuSum[1]),
+		System:     forceToFloat64(cpuSum[2]),
+		Nice:       forceToFloat64(cpuSum[3]),
+		Idle:       forceToFloat64(cpuSum[4]),
+		Wait:       forceToFloat64(cpuSum[5]),
+		Irq:        forceToFloat64(cpuSum[6]),
+		Srq:        forceToFloat64(cpuSum[7]),
+		Zero:       forceToFloat64(cpuSum[8]),
+		prevUser:   forceToFloat64(cpuSum[1]),
+		prevSystem: forceToFloat64(cpuSum[2]),
+		prevNice:   forceToFloat64(cpuSum[3]),
+		prevIdle:   forceToFloat64(cpuSum[4]),
+		prevWait:   forceToFloat64(cpuSum[5]),
+		prevIrq:    forceToFloat64(cpuSum[6]),
+		prevSrq:    forceToFloat64(cpuSum[7]),
+		prevZero:   forceToFloat64(cpuSum[8]),
 	}
 }
 
-func forceToInt(variable string) int {
-	value, _ := strconv.Atoi(variable)
+func forceToFloat64(variable string) float64 {
+	value, _ := strconv.ParseFloat(variable, 64)
 	return value
 }

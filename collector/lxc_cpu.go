@@ -61,8 +61,8 @@ func (c *lxcCPUCollector) Init() error {
 
 func (c *lxcCPUCollector) Update(ch chan<- prometheus.Metric) error {
 	physicalStat, _ = physicalStat.Refresh()
-	totalSystem := 0
-	totalUser := 0
+	var totalSystem float64
+	var totalUser float64
 	for _, containerName := range c.lxcStat.GetContainers() {
 		containerStat, err := c.getContainerStat(containerName)
 		if err != nil {
@@ -71,17 +71,17 @@ func (c *lxcCPUCollector) Update(ch chan<- prometheus.Metric) error {
 		totalSystem += containerStat.System
 		totalUser += containerStat.User
 
-		ch <- prometheus.MustNewConstMetric(c.cpu, prometheus.CounterValue, float64(containerStat.User), "user", containerName)
-		ch <- prometheus.MustNewConstMetric(c.cpu, prometheus.CounterValue, float64(containerStat.System), "system", containerName)
+		ch <- prometheus.MustNewConstMetric(c.cpu, prometheus.CounterValue, containerStat.User, "user", containerName)
+		ch <- prometheus.MustNewConstMetric(c.cpu, prometheus.CounterValue, containerStat.System, "system", containerName)
 		ch <- prometheus.MustNewConstMetric(c.cpuPrecentage, prometheus.CounterValue, c.getPrecentage(&containerStat), containerName)
 	}
-	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysical, prometheus.CounterValue, float64(physicalStat.System-totalSystem), "system")
-	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysical, prometheus.CounterValue, float64(physicalStat.User-totalUser), "user")
-	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysical, prometheus.CounterValue, float64(physicalStat.Idle), "idle")
-	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysical, prometheus.CounterValue, float64(physicalStat.Wait), "wait")
-	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysical, prometheus.CounterValue, float64(physicalStat.Nice), "nice")
-	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysical, prometheus.CounterValue, float64(physicalStat.Srq), "sqr")
-	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysical, prometheus.CounterValue, float64(physicalStat.Irq), "irq")
+	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysical, prometheus.CounterValue, physicalStat.System-totalSystem, "system")
+	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysical, prometheus.CounterValue, physicalStat.User-totalUser, "user")
+	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysical, prometheus.CounterValue, physicalStat.Idle, "idle")
+	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysical, prometheus.CounterValue, physicalStat.Wait, "wait")
+	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysical, prometheus.CounterValue, physicalStat.Nice, "nice")
+	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysical, prometheus.CounterValue, physicalStat.Srq, "sqr")
+	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysical, prometheus.CounterValue, physicalStat.Irq, "irq")
 	ch <- prometheus.MustNewConstMetric(c.cpuRealPhysicalPrecentage, prometheus.CounterValue, c.getRealPhysicalPrecentage(totalUser, totalSystem, &physicalStat))
 
 	return nil
@@ -95,9 +95,9 @@ func (c *lxcCPUCollector) getPrecentage(procStat *lxc.ProcStat) float64 {
 	return float64(int(precentage*100)) / 100
 }
 
-func (c *lxcCPUCollector) getRealPhysicalPrecentage(totalUser, totalSystem int, procStat *cpu.ProcStat) float64 {
-	idle := float64(procStat.Idle + procStat.Wait)
-	total := float64(procStat.User+procStat.System-totalSystem-totalUser) + idle
+func (c *lxcCPUCollector) getRealPhysicalPrecentage(totalUser, totalSystem float64, procStat *cpu.ProcStat) float64 {
+	idle := procStat.Idle + procStat.Wait
+	total := procStat.User + procStat.System - totalSystem - totalUser + idle
 	precentage := (total - idle) / total * 100
 
 	return float64(int(precentage*100)) / 100

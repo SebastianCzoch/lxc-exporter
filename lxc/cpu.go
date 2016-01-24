@@ -12,8 +12,8 @@ import (
 )
 
 type ProcStat struct {
-	User   int
-	System int
+	User   float64
+	System float64
 }
 
 var (
@@ -37,17 +37,16 @@ func (l *LXC) GetProcStat(containerName string) (ProcStat, error) {
 	return parseProcStat(cpuStat), nil
 }
 
-func (p *ProcStat) CalculateUsageInPrecentage(physical cpu.ProcStat) float32 {
-	// prevIdle, prevTotal := physical.GetPrevIdleAndTotal()
-	total := float32(p.User + p.System + physical.Idle + physical.Wait)
-	idle := float32(physical.Idle + physical.Wait)
+func (p *ProcStat) CalculateUsageInPrecentage(physical cpu.ProcStat) float64 {
+	total := p.User + p.System + physical.Idle + physical.Wait
+	idle := physical.Idle + physical.Wait
 	diffIdle := idle
 	diffTotal := total
 	fmt.Println("Idle:", diffIdle)
 	fmt.Println("Total:", diffTotal)
 	usage := (diffTotal - diffIdle) / diffTotal * 100
 
-	return float32(int(usage*100)) / 100
+	return float64(int(usage*100)) / 100
 }
 
 func (l *LXC) fetchProcStat(containerName string) ([]byte, error) {
@@ -74,10 +73,10 @@ func parseProcStat(content []byte) ProcStat {
 	user := strings.Split(lines[0], " ")
 	system := strings.Split(lines[1], " ")
 
-	return ProcStat{User: forceToInt(user[1]), System: forceToInt(system[1])}
+	return ProcStat{User: forceToFloat64(user[1]), System: forceToFloat64(system[1])}
 }
 
-func forceToInt(variable string) int {
-	value, _ := strconv.Atoi(variable)
+func forceToFloat64(variable string) float64 {
+	value, _ := strconv.ParseFloat(variable, 64)
 	return value
 }
