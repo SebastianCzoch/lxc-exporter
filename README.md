@@ -1,5 +1,5 @@
 # LXC exporter
-LXC exporter is small application which are providing some metrics about LXC containers running on host in Prometheus.io format.
+LXC exporter is small application written in go which are providing some metrics about LXC containers running on host in Prometheus.io format.
 It's beta version, already tested on Ubuntu Willy (15.10) and linux kernel 4.x.x
 
 ## Metrics
