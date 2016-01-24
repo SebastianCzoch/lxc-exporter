@@ -18,9 +18,9 @@ It's beta version, already tested on Ubuntu Willy (15.10) and linux kernel 4.x.x
 
 ## Building and running
 
-    go build
+    make
     ./lxc_exporter <flags>
 
 ## Running tests
 
-    go test ./...
+    make test
