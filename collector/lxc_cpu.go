@@ -22,6 +22,7 @@ var (
 	physicalStat   cpu.ProcStat
 )
 
+// NewCPUStatCollector is a function which return new lxc cpu collector
 func NewCPUStatCollector() Collector {
 	return &lxcCPUCollector{
 		cpu: prometheus.NewDesc(

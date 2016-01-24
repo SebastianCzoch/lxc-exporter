@@ -11,6 +11,7 @@ type lxcMemCollector struct {
 	lxcStat *lxc.LXC
 }
 
+// NewMemStatCollector is a method which return new lxc memory collector
 func NewMemStatCollector() Collector {
 	return &lxcMemCollector{
 		memory: prometheus.NewDesc(

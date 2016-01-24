@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// ProcStat is a method which represent cpu stats from cgroups
 type ProcStat struct {
 	User   float64
 	System float64
@@ -19,6 +20,7 @@ var (
 	}
 )
 
+// GetProcStat is a method which returns ProcStat struct for selected container
 func (l *LXC) GetProcStat(containerName string) (ProcStat, error) {
 	if !l.containerExists(containerName) {
 		return ProcStat{}, errorContainerNotFound

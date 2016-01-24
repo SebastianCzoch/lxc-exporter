@@ -11,6 +11,7 @@ var (
 	procStatPath = "/proc/stat"
 )
 
+// ProcStat is a struct which represent cpu usage in Golang
 type ProcStat struct {
 	User       float64
 	System     float64
@@ -30,6 +31,7 @@ type ProcStat struct {
 	prevZero   float64
 }
 
+// GetProcStat is a function which returns new ProcStat structure
 func GetProcStat() (ProcStat, error) {
 	content, err := fetchProcStat()
 	if err != nil {
@@ -39,6 +41,7 @@ func GetProcStat() (ProcStat, error) {
 	return parseProcStat(content), nil
 }
 
+// Refresh is a method which returns new ProcStat structure (based on newest data)
 func (p *ProcStat) Refresh() (ProcStat, error) {
 	content, err := fetchProcStat()
 	if err != nil {

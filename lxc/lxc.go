@@ -24,11 +24,13 @@ var (
 	errorContainerNotFound  = errors.New("container not found")
 )
 
+// LXC is a struct which provide some methods to deal witch LXC containers
 type LXC struct {
 	kernelVersion  int
 	containersPath string
 }
 
+// New is a function which return new LXC struct
 func New(kernelVersion int) (*LXC, error) {
 	err := checkCGroups()
 	if err != nil {
@@ -46,6 +48,7 @@ func New(kernelVersion int) (*LXC, error) {
 	}, nil
 }
 
+// GetContainers is a method which returns slice of containers names running on host
 func (l *LXC) GetContainers() []string {
 	var containers = []string{}
 	files, _ := ioutil.ReadDir(l.containersPath)

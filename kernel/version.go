@@ -11,6 +11,7 @@ var (
 	kernelVersionFile = "/proc/version"
 )
 
+// GetVersion is a function which returns version of kernel from /proc/version
 func GetVersion() (string, error) {
 	content, err := getVersionFile()
 	if err != nil {
@@ -20,6 +21,7 @@ func GetVersion() (string, error) {
 	return getKernelVersionFromContent(content), nil
 }
 
+// GetMajorVersion is a function which returns version of kernel from /proc/version (only major(first) number)
 func GetMajorVersion() (int, error) {
 	content, err := getVersionFile()
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// MemStat is a struct which contains usage of memory read from cgroups
 type MemStat struct {
 	Usage float64
 }
@@ -16,6 +17,7 @@ var (
 	}
 )
 
+// GetMemStat is a method which returns MemStat struct for selected container
 func (l *LXC) GetMemStat(containerName string) (MemStat, error) {
 	if !l.containerExists(containerName) {
 		return MemStat{}, errorContainerNotFound

@@ -25,6 +25,12 @@ var (
 	)
 )
 
+// LXCCollector implements the prometheus.Collector interface.
+type LXCCollector struct {
+	collectors map[string]collector.Collector
+}
+
+// StartServer is a method which starts HTTP server
 func StartServer(addr *string) {
 	http.Handle("/metrics", prometheus.Handler())
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -42,6 +48,7 @@ func StartServer(addr *string) {
 	}
 }
 
+// StartColectors is a function which load all available containers
 func StartColectors() {
 	loadCollectors()
 	for name, c := range collectors {
@@ -53,11 +60,6 @@ func StartColectors() {
 	}
 
 	prometheus.MustRegister(LXCCollector{collectors: collectors})
-}
-
-// LXCCollector implements the prometheus.Collector interface.
-type LXCCollector struct {
-	collectors map[string]collector.Collector
 }
 
 // Describe implements the prometheus.Collector interface.
