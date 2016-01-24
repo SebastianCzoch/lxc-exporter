@@ -29,6 +29,11 @@ func NewCPUStatCollector() Collector {
 			"Seconds the cpus spent in each mode.",
 			[]string{"mode", "container"}, nil,
 		),
+		cpuPrecentage: prometheus.NewDesc(
+			prometheus.BuildFQName(Namespace, "", "cpu_precentage"),
+			"Precentage of usage processor",
+			[]string{"container"}, nil,
+		),
 		cpuRealPhysical: prometheus.NewDesc(
 			prometheus.BuildFQName(Namespace, "", "cpu_physical_real"),
 			"Seconds the real physical cpu spent in each mode.",
@@ -38,11 +43,6 @@ func NewCPUStatCollector() Collector {
 			prometheus.BuildFQName(Namespace, "", "cpu_physical_real_precentage"),
 			"Precentage of usage processor",
 			[]string{}, nil,
-		),
-		cpuPrecentage: prometheus.NewDesc(
-			prometheus.BuildFQName(Namespace, "", "cpu_precentage"),
-			"Precentage of usage processor",
-			[]string{"container"}, nil,
 		),
 	}
 }
@@ -100,7 +100,12 @@ func (c *lxcCPUCollector) getRealPhysicalPrecentage(totalUser, totalSystem float
 	total := procStat.User + procStat.System - totalSystem - totalUser + idle
 	precentage := (total - idle) / total * 100
 
-	return float64(int(precentage*100)) / 100
+	precentage = float64(int(precentage*100)) / 100
+	if precentage < 0 {
+		return 0
+	}
+
+	return precentage
 }
 
 func (c *lxcCPUCollector) getContainerStat(containerName string) (lxc.ProcStat, error) {

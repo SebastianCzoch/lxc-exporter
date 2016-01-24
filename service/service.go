@@ -19,7 +19,7 @@ var (
 			Namespace: collector.Namespace,
 			Subsystem: "exporter",
 			Name:      "scrape_duration_seconds",
-			Help:      "node_exporter: Duration of a scrape job.",
+			Help:      "lxc_exporter: Duration of a scrape job.",
 		},
 		collectorLabelNames,
 	)
@@ -43,7 +43,7 @@ func StartServer(addr *string) {
 }
 
 func StartColectors() {
-	collectors["lxc_cpu"] = collector.NewCPUStatCollector()
+	loadCollectors()
 	for name, c := range collectors {
 		err := c.Init()
 		if err != nil {
@@ -90,6 +90,9 @@ func execute(name string, c collector.Collector, ch chan<- prometheus.Metric) {
 		return
 	}
 
-	log.Debugf("OK: %s collector succeeded after %fs.", name, duration.Seconds())
 	scrapeDurations.WithLabelValues(name, "success").Observe(duration.Seconds())
+}
+
+func loadCollectors() {
+	collectors["lxc_cpu"] = collector.NewCPUStatCollector()
 }
