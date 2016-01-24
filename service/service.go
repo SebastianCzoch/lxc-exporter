@@ -95,4 +95,5 @@ func execute(name string, c collector.Collector, ch chan<- prometheus.Metric) {
 
 func loadCollectors() {
 	collectors["lxc_cpu"] = collector.NewCPUStatCollector()
+	collectors["lxc_mem"] = collector.NewMemStatCollector()
 }
