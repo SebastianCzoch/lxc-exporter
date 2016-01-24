@@ -3,7 +3,6 @@ package lxc
 import (
 	"testing"
 
-	"github.com/SebastianCzoch/lxc-exporter/cpu"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -60,16 +59,19 @@ func TestFetchProcStat(t *testing.T) {
 	assert.Equal(t, "user 3092210213\nsystem 311472536\n", string(res))
 }
 
-func TestForceToInt(t *testing.T) {
-	assert.Equal(t, 1, forceToInt("1"))
-	assert.Equal(t, 0, forceToInt("a1"))
-	assert.Equal(t, 0, forceToInt("1a"))
+func TestForceToFloat64(t *testing.T) {
+	assert.Equal(t, float64(1), forceToFloat64("1"))
+	assert.Equal(t, float64(0), forceToFloat64("a1"))
+	assert.Equal(t, float64(0), forceToFloat64("1a"))
+	assert.Equal(t, float64(1.21), forceToFloat64("1.21"))
+	assert.Equal(t, float64(12), forceToFloat64("1.2e1"))
+	assert.Equal(t, float64(0), forceToFloat64("1.2s1"))
 }
 
 func TestParseProcStat(t *testing.T) {
 	res := parseProcStat([]byte("user 3092210213\nsystem 311472536\n"))
-	assert.Equal(t, 3092210213, res.User)
-	assert.Equal(t, 311472536, res.System)
+	assert.Equal(t, float64(3092210213), res.User)
+	assert.Equal(t, float64(311472536), res.System)
 }
 
 func TestGetProcStat(t *testing.T) {
@@ -81,26 +83,6 @@ func TestGetProcStat(t *testing.T) {
 	cgroupPath = "../test/sys/fs/cgroup"
 	res, err := l.GetProcStat("test-container")
 	assert.NoError(t, err)
-	assert.Equal(t, 3092210213, res.User)
-	assert.Equal(t, 311472536, res.System)
-}
-
-func TestCalculateUsageInPrecentage(t *testing.T) {
-	physical := cpu.ProcStat{
-		User:   371569,
-		System: 78721,
-		Nice:   342711,
-		Idle:   39660594,
-		Wait:   23304,
-		Irq:    0,
-		Srq:    19646,
-		Zero:   0,
-	}
-
-	object := ProcStat{
-		User:   2210213,
-		System: 79536,
-	}
-
-	assert.Equal(t, float32(5.45), object.CalculateUsageInPrecentage(physical))
+	assert.Equal(t, float64(3092210213), res.User)
+	assert.Equal(t, float64(311472536), res.System)
 }
