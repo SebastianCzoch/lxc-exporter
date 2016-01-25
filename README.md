@@ -1,5 +1,5 @@
 # LXC exporter
-[![Build Status](https://travis-ci.org/SebastianCzoch/lxc-exporter.svg?branch=master)](https://travis-ci.org/SebastianCzoch/lxc-exporter) [![GoDoc](https://godoc.org/github.com/SebastianCzoch/lxc-exporter?status.svg)](https://godoc.org/github.com/SebastianCzoch/lxc-exporter)  [![License](https://img.shields.io/badge/licence-Apache%20v2-green.svg)](./LICENSE)
+[![Build Status](https://travis-ci.org/SebastianCzoch/lxc-exporter.svg?branch=master)](https://travis-ci.org/SebastianCzoch/lxc-exporter) [![Code Climate](https://codeclimate.com/github/SebastianCzoch/lxc-exporter/badges/gpa.svg)](https://codeclimate.com/github/SebastianCzoch/lxc-exporter) [![GoDoc](https://godoc.org/github.com/SebastianCzoch/lxc-exporter?status.svg)](https://godoc.org/github.com/SebastianCzoch/lxc-exporter)  [![License](https://img.shields.io/badge/licence-Apache%20v2-green.svg)](./LICENSE)
 
 LXC exporter is small application written in go which are providing some metrics about LXC containers running on host in Prometheus.io format.
 It's beta version, already tested on Ubuntu Willy (15.10) and linux kernel 4.x.x
