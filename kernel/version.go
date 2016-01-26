@@ -37,7 +37,7 @@ func getVersionFile() (string, error) {
 }
 
 func getKernelVersionFromContent(content string) string {
-	pattern := regexp.MustCompile("Linux version ([0-9]\\.[0-9]\\.[0-9])+")
+	pattern := regexp.MustCompile("Linux version ([0-9.])+")
 	found := pattern.FindString(content)
 	return strings.Replace(found, "Linux version ", "", -1)
 }

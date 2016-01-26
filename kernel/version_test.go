@@ -17,6 +17,10 @@ func TestGetKernelVersionFromContent(t *testing.T) {
 	content := "Linux version 4.1.6-249 (build-bot@example.com) (gcc version 4.9.1 (Ubuntu/Linaro 4.9.1-10ubuntu2) ) #1 SMP Mon Aug 31 12:34:47 UTC 2015"
 	result := getKernelVersionFromContent(content)
 	assert.Equal(t, "4.1.6", result)
+
+	content = "Linux version 3.13-0.bpo.1-amd64 (debian-kernel@lists.debian.org) (gcc version 4.6.3 (Debian 4.6.3-14) ) #1 SMP Debian 3.13.10-1~bpo70+1 (2014-04-23)"
+	result = getKernelVersionFromContent(content)
+	assert.Equal(t, "3.13", result)
 }
 
 func TestGetMajorVersionFromString(t *testing.T) {
