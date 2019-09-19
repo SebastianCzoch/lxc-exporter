@@ -1,3 +1,6 @@
+# This repository is no longer maintained.
+Issue reports and pull requests will not be attended.
+
 # LXC exporter
 [![Build Status](https://travis-ci.org/SebastianCzoch/lxc-exporter.svg?branch=master)](https://travis-ci.org/SebastianCzoch/lxc-exporter) [![Code Climate](https://codeclimate.com/github/SebastianCzoch/lxc-exporter/badges/gpa.svg)](https://codeclimate.com/github/SebastianCzoch/lxc-exporter) [![GoDoc](https://godoc.org/github.com/SebastianCzoch/lxc-exporter?status.svg)](https://godoc.org/github.com/SebastianCzoch/lxc-exporter)  [![License](https://img.shields.io/badge/licence-Apache%20v2-green.svg)](./LICENSE)
 
